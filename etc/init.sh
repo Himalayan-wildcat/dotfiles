@@ -28,7 +28,9 @@ has() {
 main() {
 
   if has "git"; then
-    git clone "$GITHUB_REPO_URL" || exit 0
+    # For test
+    git clone -b test "$GITHUB_REPO_URL" || exit 0
+    # git clone "$GITHUB_REPO_URL" || exit 0
   elif has "curl" || has "wget"; then
     if has "curl"; then
       :
