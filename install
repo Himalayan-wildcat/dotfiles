@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+
+set -o nounset
+set -o pipefail
+
+INPUT=
+OS=
+DISTRO=
+SHELL_TO_APPLY=
+readonly REPO_URL='https://github.com/Himalayan-wildcat/dotfiles.git'
+readonly TARGET_DIR="${HOME}"
+readonly DOTFILES_DIR="${TARGET_DIR}/.dotfiles"
+
+
+now() {
+  date '+%Y-%m-%d %H:%m:%S'
+}
+
+info() {
+  local -r msg="$*"
+  echo -e "$(now) \033[0;32m[info]\033[0m ${msg}"
+}
+
+err() {
+  local -r msg="$*"
+  echo -e "$(now) \033[0;31m[error]\033[0m ${msg}" >&2
+}
+
+err_exit() {
+  local -r msg="$*"
+  echo -e "$(now) \033[0;31m[error]\033[0m ${msg}" >&2
+  exit 1
+}
+
+has() {
+    local -r cmd="$1"
+    if ! command -v "$cmd" > /dev/null; then
+      return 1
+    fi
+    return 0
+}
+
+
+### Main program ###
+cd "$TARGET_DIR" || err_exit "Failed to cd to ${TARGET_DIR}."
+cat <<EOF
+
+////////////////////////////////////////////
+
+         _       _    __ _ _
+      __| | ___ | |_ / _(_) | ___  ___
+     / _  |/ _ \| __| |_| | |/ _ \/ __|
+    | (_| | (_) | |_|  _| | |  __/\__ \\
+     \__,_|\___/ \__|_| |_|_|\___||___/
+
+
+////////////////////////////////////////////
+
+EOF
+
+OS=$(uname -s)
+readonly OS
+if [[ "$OS" == 'Linux' ]]; then
+  readonly SHELL_TO_APPLY="bash"
+  DISTRO=$(cat /etc/*-release | head -n1 | cut -d'=' -f 2 | sed 's/"//g' | tr '[:upper:]' '[:lower:]')
+  readonly DISTRO
+  info "OS: ${OS}/${DISTRO}"
+elif [[ "$OS" == 'Darwin' ]]; then
+  readonly SHELL_TO_APPLY="zsh"
+  info "OS: ${OS}"
+fi
+
+echo
+echo "Shell to apply for ${OS}: ${SHELL_TO_APPLY}"
+while :; do
+  read -rp "Ok to procced? [y/n]: " INPUT
+  case "$INPUT" in
+    [yY]*)
+           break
+           ;;
+    [nN]*)
+           exit 1
+           ;;
+    *)
+           err "Invalid input. Type [y/n]."
+	   ;;
+  esac
+done
+
+# Preflight checks.
+if ! has "git"; then
+  err_exit "line ${LINENO} 'git' is not installed. Install it to proceed."
+fi
+if ! has "curl" && ! has "wget"; then
+  err_exit "(line ${LINENO}) 'git', or 'wget' is not installed. Install either of one  to proceed."
+fi
+if [[ -d "$DOTFILES_DIR" ]]; then
+  err_exit "(line ${LINENO}) ${DOTFILES_DIR} already exist. Remove it to proceed."
+fi
+
+# Place the dotfiles under ~/.dotfiles/.
+info "Cloning dotfiles into ${HOME}/${DOTFILES_DIR}/ ..."
+mkdir "$DOTFILES_DIR" || err_exit "(line ${LINENO}) failed to create a dir(${CUR_DIR}/${DOTFILES_DIR}/)"
+cd "$DOTFILES_DIR" && \
+git init -q && \
+git config core.sparseCheckout true && \
+git sparse-checkout init
+if [[ "$OS" == 'Darwin' ]]; then
+  git sparse-checkout add '!.bash*'
+elif [[ "$OS" == 'Linux' ]]; then
+  git sparse-checkout add '!.zsh*'
+fi
+git remote add origin "$REPO_URL" && \
+git pull origin main -q
+
+# Create symlinks under $HOME/.
+info "Creating symlinks under ~/ ..."
+find "$DOTFILES_DIR" -type f ! -name '.gitignore' -name '.*' -print0 | xargs -0 -I@ ln -snf @ "$TARGET_DIR" || {
+  err "(line ${LINENO}) failed to create the symlinks."
+  info "${DOTFILES_DIR} has been deleted."
+  exit 0
+}
+
+if [[ "$OS" == 'Linux' ]]; then
+cat <<EOF
+
+Add the following statements in your ~/.bashrc.
+from here --------------------------------------------------------------------
+if [ -f ~/.additional_bashrc ]; then
+    # shellcheck disable=1090
+    . ~/.additional_bashrc
+fi
+
+if [ -f ~/.bash_aliases ]; then
+    # shellcheck disable=1090
+    . ~/.bash_aliases
+fi
+
+# Start emacs daemon unless alrady up and running.
+start_emacsd() {
+  if ! emacsclient -e 0 > /dev/null 2>&1 ;then
+    echo "> Starting emacs as daemon ..."
+    emacs --daemon
+  fi
+}
+
+start_emacsd
+------------------------------------------------------------------------to here
+EOF
+elif [[ "$OS" == 'Darwin' ]]; then
+cat <<EOF
+
+Create ~/.zshrc if not, then add the following statements within if you like.
+Additional .zshrc that should go under git control.
+
+from here --------------------------------------------------------------------
+if [ -f ~/.additional_zshrc ]; then
+    # shellcheck disable=1090
+    . ~/.additional_zshrc
+fi
+
+if [ -f ~/.zsh_aliases ]; then
+    # shellcheck disable=1090
+    . ~/.zsh_aliases
+fi
+
+# Start emacs daemon unless already up and running.
+start_emacsd() {
+  if ! emacsclient -e 0 > /dev/null 2>&1 ;then
+    echo "> Starting emacs as daemon ..."
+    emacs --daemon
+  fi
+}
+
+start_emacsd
+------------------------------------------------------------------------to here
+EOF
+fi
+
+info "Process has successfully been completed."
