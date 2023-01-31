@@ -1,0 +1,42 @@
+# --------------------------------
+# User specific shell variables
+# --------------------------------
+export PS1='[\u@\h \w]\$ '
+
+# Emacs
+export ALTERNATE_EDITOR=""
+export EDITOR='emacsclient -t'
+export VISUAL='emacsclient -c -a emacs'
+
+# kubectl
+export KUBE_EDITOR='emacs -nw'
+
+# tfenv
+if [ -d "$HOME/.tfenv" ]; then
+ export PATH="$PATH:$HOME/.tfenv/bin"
+fi
+
+# Golang
+if /usr/local/go/bin/go version >/dev/null; then
+  export PATH="$PATH:/usr/local/go/bin"
+  if ! [[ -d "$HOME/.go" ]]; then
+    mkdir "$HOME"/.go
+  fi
+  export GOPATH="$HOME"/.go
+  export GOBIN="$GOPATH"/bin
+  export PATH="${PATH}:${GOBIN}"
+fi
+
+# Poetry
+export PATH="$PATH:$HOME/.poetry/bin"
+
+# NVM
+# shellcheck disable=1090
+# if [[ -d "$HOME/.nvm" ]]; then
+#   export NVM_DIR="$HOME/.nvm" && \
+#   [[ -s "$NVM_DIR/nvm.sh" ]] && . "$NVM_DIR/nvm.sh"
+#   [[ -s "$NVM_DIR/bash_completion" ]] && . "$NVM_DIR/bash_completion"
+# fi
+
+# Rust
+. "$HOME/.cargo/env"

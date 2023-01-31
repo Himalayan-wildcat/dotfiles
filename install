@@ -106,9 +106,9 @@ git init -q && \
 git config core.sparseCheckout true && \
 git sparse-checkout init
 if [[ "$OS" == 'Darwin' ]]; then
-  git sparse-checkout add '!.bash*'
+  git sparse-checkout add '!.*bash*'
 elif [[ "$OS" == 'Linux' ]]; then
-  git sparse-checkout add '!.zsh*'
+  git sparse-checkout add '!.*zsh*'
 fi
 git remote add origin "$REPO_URL" && \
 git pull origin main -q

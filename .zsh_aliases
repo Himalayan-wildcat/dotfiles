@@ -1,0 +1,71 @@
+# ---------------------------------------
+# User specificc aliases and functions
+# ---------------------------------------
+# Built-in sh command
+alias ls='ls -G'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias watch='watch '
+alias hist='history 1'
+
+# Google Chrome
+alias chrome='google-chrome &'
+alias kill_chrome='pkill chrome'
+# alias cb='chromium-browser --full-screen >/dev/null 2>&1'
+
+# git
+alias ga='git add'
+alias gc='git commit'
+alias gcmsg='git commit -m'
+alias gc='git commit'
+alias gb='git branch'
+alias gco='git checkout'
+alias gst='git status'
+alias gd='git diff'
+alias gs='git stash'
+alias gf='git fetch'
+alias gm='git merge'
+alias gd='git diff'
+alias defaultbranch="git symbolic-ref refs/remotes/origin/HEAD | awk -F '[/]' '{print $NF}'"
+alias gt="git tag"
+alias glogp="git log --pretty='format:%C(yellow)%h %C(green)%cd %C(reset)%s %C(red)%d %C(cyan)[%an]' --date=iso"
+# alias gparent='git show-branch | grep * | grep -V $(git rev-parse --abrev-ref HEAD) | head -1 | awk -F '[]~^[]' '{print $2}''
+
+# Clipboard
+alias c='xsel --clipboard --input'
+alias p='xsel --clipboard --output'
+
+# Emacs
+# alias ec='TERM=screen-256color emacsclient -nw'
+alias ec='emacsclient -nw'
+alias start_ed='emacs --daemon'
+alias kill_ed='pkill emacs'
+alias restart_ed='kill_ed && start_ed'
+
+# Terraform
+alias tf="terraform"
+alias tw='terraform workspace'
+alias tfi="tf init"
+alias tff="tf fmt"
+alias tfv="tf validate"
+alias tfo="tf output"
+alias tfp="tfv && tf plan --out=tfplan"
+alias tfa="tf apply \"tfplan\""
+alias tfc="tf console"
+
+# Tmux
+alias t='tmux'
+
+# Docker
+alias d='docker'
+
+# Kubectl
+alias k='kubectl'
+alias kn='kubectl -n kube-system'
+
+# Virtualbox
+alias vb='virtualbox'

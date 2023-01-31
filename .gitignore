@@ -1,0 +1,15 @@
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# JetBrains
+/.idea
+
+# Visual studio
+/.vscode
+
+# Emacs
+*~
+\#*\#
+\#*

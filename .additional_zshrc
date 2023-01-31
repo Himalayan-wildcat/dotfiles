@@ -1,0 +1,85 @@
+has() {
+    local -r cmd="$1"
+    if ! command -v "$cmd" > /dev/null; then
+      return 1
+    fi
+    return 0
+}
+
+# emacs keybinding
+bindkey -d
+bindkey -e
+
+# terminal prompt
+export PS1="[%n@Tm %1~] %# "
+
+# history
+HISTSIZE=10000
+SAVEHIST=10000
+
+# Configure completions for brew
+if has "brew"; then
+  fpath=($(brew --prefix)/share/zsh/site-functions $fpath)
+  autoload -Uz compinit && compinit -i
+fi
+
+# starship
+if has "starship"; then
+  export STARSHIP_CONFIG=~/.dotfiles/.starship.toml
+  eval "$(starship init zsh)"
+fi
+
+# kubectl
+if has "kubectl"; then
+  export KUBE_EDITOR='emacs -nw'
+fi
+
+# tfenv
+# shellcheck shell=sh
+if has "tfenv" && [ -d "$HOME/.tfenv" ]; then
+ export PATH="$PATH:$HOME/.tfenv/bin"
+ export TFENV_ARCH=arm64
+
+ # 0: No debug output
+ # 1: Simple debug output
+ # 2: Extended debug output, with source file names and interactive debug shells on error
+ # 3: Debug level 2 + Bash execution tracing
+ export TFENV_DEBUG=0
+fi
+
+# NVM
+if has "nvm" && [ -d "${HOME}/.nvm" ]; then
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+fi
+
+# golang
+if has "go"; then
+  # shellcheck shell=sh
+  if ! [ -d "${HOME}/.go" ]; then
+     mkdir "${HOME}/.go"
+   fi
+
+   export GOPATH="${HOME}/.go"
+   export GOBIN="${GOPATH}/bin"
+   export PATH="${PATH}:${GOBIN}"
+fi
+
+# Rust
+if has "cargo" && [ -d "${HOME}/.cargo" ]; then
+  \. "$HOME/.cargo/env"
+fi
+
+# Poetry(python3)
+if has "poetry" && [ -d "${HOME}/poetry/bin" ]; then
+  export PATH="$HOME/.poetry/bin:$PATH"
+  export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+fi
+
+# Pyenv
+if has "pyenv"  && [ -d "${HOME}/.pyenv" ]; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init --path)"
+fi
