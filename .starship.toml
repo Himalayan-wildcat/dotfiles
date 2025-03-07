@@ -23,7 +23,7 @@ ssh_only = true
 format = '[$ssh_symbol](fg:14) '
 
 [username]
-style_user = 'fg:255'
+# style_user = 'fg:250'
 format = '\[[$user]($style):'
 show_always = true
 
@@ -42,12 +42,12 @@ style = "fg:13"
 
 [fill]
 symbol="─"
-style = "fg:235"
+style = 'fg:240'
 
 [cmd_duration]
 min_time = 0
 show_milliseconds = true
-style = "fg:235"
+style = 'fg:240'
 format = "[$duration]($style)"
 
 [time]
