@@ -13,8 +13,8 @@ alias watch='watch '
 alias hist='history 1'
 
 # Google Chrome
-alias chrome='google-chrome &'
-alias kill_chrome='pkill chrome'
+# alias chrome='google-chrome &'
+# alias kill_chrome='pkill chrome'
 # alias cb='chromium-browser --full-screen >/dev/null 2>&1'
 
 # git
@@ -36,15 +36,19 @@ alias glogp="git log --pretty='format:%C(yellow)%h %C(green)%cd %C(reset)%s %C(r
 # alias gparent='git show-branch | grep * | grep -V $(git rev-parse --abrev-ref HEAD) | head -1 | awk -F '[]~^[]' '{print $2}''
 
 # Clipboard
-alias c='xsel --clipboard --input'
-alias p='xsel --clipboard --output'
+# alias c='xsel --clipboard --input'
+# alias p='xsel --clipboard --output'
+alias c='pbcopy'
+alias p='pbpaste'
 
 # Emacs
-# alias ec='TERM=screen-256color emacsclient -nw'
-alias ec='emacsclient -nw'
-alias start_ed='emacs --daemon'
 alias kill_ed='pkill emacs'
-alias restart_ed='kill_ed && start_ed'
+alias e="emacs -nw"
+# alias ec='TERM=screen-256color emacsclient -nw'
+# alias ec='emacsclient -nw'
+# alias start_ed='emacs --daemon'
+
+# alias restart_ed='kill_ed && start_ed'
 
 # Terraform
 alias tf="terraform"
@@ -68,4 +72,4 @@ alias k='kubectl'
 alias kn='kubectl -n kube-system'
 
 # Virtualbox
-alias vb='virtualbox'
+# alias vb='virtualbox'

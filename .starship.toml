@@ -11,9 +11,14 @@ $hostname\
 $username\
 $directory\
 $git_branch\
+$nodejs\
 $python\
 $conda\
 $golang\
+$rust\
+$kotlin\
+$terraform\
+$kubernetes\
 $cmd_duration
 $character
 """
@@ -32,12 +37,12 @@ success_symbol = "[➜](fg:10) "
 error_symbol = "[✗](fg:1) "
 
 [directory]
-format = '[$path]($style)[$read_only]($read_only_style)\] '
+format = '[$path]($style)[$read_only]($read_only_style)\]'
 truncation_length = 100
 truncate_to_repo = false
 
 [git_branch]
-format='\[[git:$branch(:$remote_branch)]($style)\] '
+format='\[[git:$branch(:$remote_branch)]($style)\]'
 style = "fg:13"
 
 [fill]
@@ -56,6 +61,9 @@ disabled = true
 [package]
 disabled = true
 
+[nodejs]
+format = '\[[$symbol$version]($style)\]'
+
 [python]
 format = '\[[py ${pyenv_prefix}(${version})(\($virtualenv\))]($style)\] '
 
@@ -63,5 +71,22 @@ format = '\[[py ${pyenv_prefix}(${version})(\($virtualenv\))]($style)\] '
 format = '\[[conda $environment]($style)\] '
 
 [golang]
-format = '\[[golang:($version)]($style)\]'
+format = '\[[$symbol($mod_version)($version)]($style)\]'
 detect_files = ["go.mod"]
+
+[rust]
+format = '\[[$symbol($mod_version)($version)]($style)\]'
+
+[kotlin]
+format = '\[[$symbol$version]($style)\]'
+kotlin_binary = 'kotlinc'
+
+[terraform]
+format = '\[[$symbol($version)]($style)\]'
+
+[kubernetes]
+format = '\[[$symbol$context]($dimmed blue)\]'
+disabled = false
+# contexts = [
+#   { context_pattern = "dev.local.cluster.k8s", style = "green", symbol = "💔 " },
+# ]
