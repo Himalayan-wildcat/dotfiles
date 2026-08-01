@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+# NOTE: consider automating update checks via GitHub Actions or Renovate.
+
+set -o nounset
+set -o pipefail
+
+readonly DOTFILES_DIR="${HOME}/.dotfiles"
+readonly FLAKE_CONFIG='hiroaki.hara'
+
+now() {
+  date '+%Y-%m-%d %H:%m:%S'
+}
+
+info() {
+  local -r msg="$*"
+  echo -e "$(now) \033[0;32m[info]\033[0m ${msg}"
+}
+
+err() {
+  local -r msg="$*"
+  echo -e "$(now) \033[0;31m[error]\033[0m ${msg}" >&2
+}
+
+err_exit() {
+  local -r msg="$*"
+  err "${msg}"
+  exit 1
+}
+
+cd "${DOTFILES_DIR}" || err_exit "could not cd into ${DOTFILES_DIR}"
+
+if ! git diff --quiet -- flake.lock; then
+  err_exit "flake.lock already has uncommitted changes; resolve that first"
+fi
+
+info "checking for nixpkgs/home-manager updates..."
+if ! nix flake update; then
+  err_exit "nix flake update failed"
+fi
+
+if git diff --quiet -- flake.lock; then
+  info "already up to date, nothing to do"
+  exit 0
+fi
+
+echo
+info "updates available, here's what changed in flake.lock:"
+echo
+git diff -- flake.lock
+echo
+
+read -r -p "Apply these updates now (rebuild + activate)? [y/N] " answer
+case "${answer}" in
+  [yY][eE][sS]|[yY])
+    info "rebuilding home-manager generation..."
+    if home-manager switch --flake "${DOTFILES_DIR}#${FLAKE_CONFIG}"; then
+      info "done, new generation activated"
+      git add flake.lock
+      git commit -m "chore(deps): update nix packages"
+      info "committed flake.lock update"
+    else
+      err "home-manager switch failed; flake.lock is still updated"
+      err "previous generation is still active, nothing broke"
+      err "fix the issue, or run: git checkout -- flake.lock"
+      exit 1
+    fi
+    ;;
+  *)
+    info "reverting flake.lock"
+    git checkout -- flake.lock
+    ;;
+esac
