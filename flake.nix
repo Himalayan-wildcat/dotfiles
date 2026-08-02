@@ -14,21 +14,40 @@
     { nixpkgs, home-manager, ... }:
     let
       mkHomeConfiguration =
-        system: module:
+        {
+          system,
+          username,
+          homeDirectory,
+        }:
         home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.${system};
-          modules = [ module ];
+          modules = [ ./home.nix ];
+
+          # username/homeDirectory differ per machine (e.g. macOS vs WSL),
+          # so they're passed in here rather than hardcoded in home.nix.
+          extraSpecialArgs = { inherit username homeDirectory; };
         };
     in
     {
       homeConfigurations = {
         # macOS (Apple Silicon).
-        "hiroaki.hara-darwin-aarch64" = mkHomeConfiguration "aarch64-darwin" ./home-darwin.nix;
+        "hiroaki.hara-darwin-aarch64" = mkHomeConfiguration {
+          system = "aarch64-darwin";
+          username = "hiroaki.hara";
+          homeDirectory = "/Users/hiroaki.hara";
+        };
 
-        # Linux / WSL. Username differs per machine, so each config points
-        # at its own home-linux.nix owner rather than a shared file.
-        "hiroh-linux-x86_64" = mkHomeConfiguration "x86_64-linux" ./home-linux.nix;
-        "hiroh-linux-aarch64" = mkHomeConfiguration "aarch64-linux" ./home-linux.nix;
+        # Linux / WSL.
+        "hiroh-linux-x86_64" = mkHomeConfiguration {
+          system = "x86_64-linux";
+          username = "hiroh";
+          homeDirectory = "/home/hiroh";
+        };
+        "hiroh-linux-aarch64" = mkHomeConfiguration {
+          system = "aarch64-linux";
+          username = "hiroh";
+          homeDirectory = "/home/hiroh";
+        };
       };
     };
 }

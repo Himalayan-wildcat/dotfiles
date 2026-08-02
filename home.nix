@@ -1,10 +1,10 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, username, homeDirectory, ... }:
 
 {
-  # Home Manager needs a bit of information about you and the paths it should
-  # manage.
-  home.username = "hiroh";
-  home.homeDirectory = "/home/hiroh";
+  # username/homeDirectory are passed in per-machine via extraSpecialArgs in
+  # flake.nix, since they differ between machines (e.g. macOS vs WSL).
+  home.username = username;
+  home.homeDirectory = homeDirectory;
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -20,38 +20,40 @@
   home.packages = [
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
-    # pkgs.buf
-    # pkgs.ktlint
+    pkgs.buf
+    pkgs.ktlint
     pkgs.uv
     pkgs.basedpyright
-    # pkgs.gh
+    pkgs.gh
     pkgs.tmux
     pkgs.starship
     pkgs.k9s
     pkgs.gopls
-    # pkgs.kubernetes-helm
-    # pkgs.helmfile
+    pkgs.kubernetes-helm
+    pkgs.helmfile
     pkgs.htop
     pkgs.rust-analyzer
     pkgs.shellcheck
-    # pkgs.terraform-ls
+    pkgs.terraform-ls
     pkgs.tree
     pkgs.docker
     pkgs.docker-compose
-    # pkgs.cmake
+    pkgs.cmake
     pkgs.cargo-binstall
-    # pkgs.coreutils-prefixed
+    pkgs.coreutils-prefixed
     pkgs.fd
-    # pkgs.postgresql
-    # pkgs.libtool
+    pkgs.postgresql
+    pkgs.libtool
     pkgs.pandoc
     pkgs.sqlite
-    # pkgs.xz
+    pkgs.xz
     pkgs.yamlfmt
-    # pkgs.google-cloud-sdk
-    # pkgs.codex
-    # pkgs.cowsay
-    # pkgs.fortune
+    pkgs.google-cloud-sdk
+    pkgs.codex
+    pkgs.cowsay
+    pkgs.fortune
+
+    # pkgs.hello
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
@@ -65,6 +67,12 @@
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
     # '')
+  ]
+  ++ lib.optionals pkgs.stdenv.isDarwin [
+    # macOS-only: AeroSpace window borders, and running Linux VMs via Lima
+    # (native Docker/containerd on Linux makes Lima unnecessary there).
+    pkgs.jankyborders
+    pkgs.lima
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -98,7 +106,7 @@
   #
   # or
   #
-  #  /etc/profiles/per-user/hiroh/etc/profile.d/hm-session-vars.sh
+  #  /etc/profiles/per-user/hiroaki.hara/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
     # EDITOR = "emacs";
