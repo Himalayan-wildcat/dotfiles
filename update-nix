@@ -35,7 +35,9 @@ case "$(uname -m)" in
 esac
 readonly ARCH_NAME
 
-readonly FLAKE_CONFIG="hiroaki.hara-${OS_NAME}-${ARCH_NAME}"
+USER_NAME="$(whoami)"
+readonly USER_NAME
+readonly FLAKE_CONFIG="${USER_NAME}-${OS_NAME}-${ARCH_NAME}"
 
 now() {
   date '+%Y-%m-%d %H:%m:%S'

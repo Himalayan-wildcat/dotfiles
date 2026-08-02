@@ -14,26 +14,21 @@
     { nixpkgs, home-manager, ... }:
     let
       mkHomeConfiguration =
-        system:
+        system: module:
         home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.${system};
-
-          # Specify your home configuration modules here, for example,
-          # the path to your home.nix.
-          modules = [ ./home.nix ];
-
-          # Optionally use extraSpecialArgs
-          # to pass through arguments to home.nix
+          modules = [ module ];
         };
     in
     {
       homeConfigurations = {
         # macOS (Apple Silicon).
-        "hiroaki.hara-darwin-aarch64" = mkHomeConfiguration "aarch64-darwin";
+        "hiroaki.hara-darwin-aarch64" = mkHomeConfiguration "aarch64-darwin" ./home-darwin.nix;
 
-        # Linux / WSL.
-        "hiroaki.hara-linux-x86_64" = mkHomeConfiguration "x86_64-linux";
-        "hiroaki.hara-linux-aarch64" = mkHomeConfiguration "aarch64-linux";
+        # Linux / WSL. Username differs per machine, so each config points
+        # at its own home-linux.nix owner rather than a shared file.
+        "hiroh-linux-x86_64" = mkHomeConfiguration "x86_64-linux" ./home-linux.nix;
+        "hiroh-linux-aarch64" = mkHomeConfiguration "aarch64-linux" ./home-linux.nix;
       };
     };
 }
