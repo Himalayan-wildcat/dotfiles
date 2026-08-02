@@ -36,8 +36,6 @@
     pkgs.shellcheck
     pkgs.terraform-ls
     pkgs.tree
-    pkgs.docker
-    pkgs.docker-compose
     pkgs.cmake
     pkgs.cargo-binstall
     pkgs.coreutils-prefixed
@@ -73,6 +71,13 @@
     # (native Docker/containerd on Linux makes Lima unnecessary there).
     pkgs.jankyborders
     pkgs.lima
+
+    # macOS-only: docker client + compose plugin, paired with Lima as the
+    # daemon. On Linux/WSL, install docker (client + daemon) via the distro's
+    # package manager instead - home-manager can't manage the system-level
+    # systemd service the daemon needs there.
+    pkgs.docker
+    pkgs.docker-compose
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -88,7 +93,8 @@
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
-
+  }
+  // lib.optionalAttrs pkgs.stdenv.isDarwin {
     ".docker/cli-plugins/docker-compose".source = "${pkgs.docker-compose}/bin/docker-compose";
   };
 
