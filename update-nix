@@ -6,7 +6,36 @@ set -o nounset
 set -o pipefail
 
 readonly DOTFILES_DIR="${HOME}/.dotfiles"
-readonly FLAKE_CONFIG='hiroaki.hara'
+
+case "$(uname -s)" in
+  Darwin)
+    OS_NAME='darwin'
+    ;;
+  Linux)
+    OS_NAME='linux'
+    ;;
+  *)
+    echo "unsupported OS: $(uname -s)" >&2
+    exit 1
+    ;;
+esac
+readonly OS_NAME
+
+case "$(uname -m)" in
+  arm64 | aarch64)
+    ARCH_NAME='aarch64'
+    ;;
+  x86_64)
+    ARCH_NAME='x86_64'
+    ;;
+  *)
+    echo "unsupported architecture: $(uname -m)" >&2
+    exit 1
+    ;;
+esac
+readonly ARCH_NAME
+
+readonly FLAKE_CONFIG="hiroaki.hara-${OS_NAME}-${ARCH_NAME}"
 
 now() {
   date '+%Y-%m-%d %H:%m:%S'

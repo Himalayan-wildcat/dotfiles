@@ -28,9 +28,8 @@
     in
     {
       homeConfigurations = {
-        # macOS (Apple Silicon). Unchanged name/system so existing
-        # `home-manager switch --flake .#hiroaki.hara` keeps working.
-        "hiroaki.hara" = mkHomeConfiguration "aarch64-darwin";
+        # macOS (Apple Silicon).
+        "hiroaki.hara-darwin-aarch64" = mkHomeConfiguration "aarch64-darwin";
 
         # Linux / WSL.
         "hiroaki.hara-linux-x86_64" = mkHomeConfiguration "x86_64-linux";
